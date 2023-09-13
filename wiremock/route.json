@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/percentage"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "../__files/percentage.json",
+    "transformers": [
+      "response-template"
+    ]
+  }
+}

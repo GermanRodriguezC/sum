@@ -1,0 +1,3 @@
+{
+  "percentage": "{{randomInt lower=5 upper=9}}"
+}

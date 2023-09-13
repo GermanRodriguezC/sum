@@ -1,0 +1,56 @@
+version: '3.9'
+services:
+  database:
+    image: postgres:13
+    restart: always
+    environment:
+      - POSTGRES_USER=sum
+      - POSTGRES_PASSWORD=sum
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./database/ddl.sql:/docker-entrypoint-initdb.d/ddl.sql
+    command: postgres -c listen_addresses=*
+
+  sum:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/sum
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    ports:
+      - "8081:8081"
+    depends_on:
+      - database
+      - wiremock
+      - redis
+      - kafka
+
+  redis:
+    image: redis:alpine
+    hostname: redis
+    ports:
+      - "6379:6379"
+
+  wiremock:
+    build:
+      context: ./wiremock
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8080:8080"
+    command: --global-response-templating --verbose
+    depends_on:
+      - kafka
+
+  kafka:
+    image: spotify/kafka
+    ports:
+      - "9092:9092"
+    environment:
+      ADVERTISED_HOST: kafka
+      ADVERTISED_PORT: 9092
+    depends_on:
+      - database
